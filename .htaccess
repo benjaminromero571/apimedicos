@@ -1,0 +1,32 @@
+RewriteEngine On
+
+# Manejar CORS preflight requests primero
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Redireccionar todas las peticiones al index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Configuraciones de seguridad
+<Files "*.php">
+    Order Deny,Allow
+    Allow from all
+</Files>
+
+# Proteger archivos sensibles
+<Files ".htaccess">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files "conexion.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Configurar headers de seguridad y CORS
+
+# Configurar tipos MIME
+AddType application/json .json

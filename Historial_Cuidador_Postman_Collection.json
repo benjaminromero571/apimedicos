@@ -1,0 +1,357 @@
+{
+  "info": {
+    "name": "Historial Cuidador API",
+    "description": "Colección de endpoints para el CRUD de Historial Cuidador",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Autenticación",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"usuario@ejemplo.com\",\n  \"password\": \"tu_password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Listar Historiales",
+      "item": [
+        {
+          "name": "Obtener Todos los Historiales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/historiales-cuidador?limit=10&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["historiales-cuidador"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Historial por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/historiales-cuidador/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["historiales-cuidador", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener por Paciente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/historiales-cuidador/paciente/1?limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["historiales-cuidador", "paciente", "1"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener por Cuidador",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/historiales-cuidador/cuidador/1?limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["historiales-cuidador", "cuidador", "1"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Búsqueda Avanzada",
+      "item": [
+        {
+          "name": "Buscar con Filtros",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/historiales-cuidador/buscar?id_paciente=1&fecha_desde=2024-01-01&fecha_hasta=2024-12-31&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["historiales-cuidador", "buscar"],
+              "query": [
+                {
+                  "key": "id_paciente",
+                  "value": "1",
+                  "description": "Opcional"
+                },
+                {
+                  "key": "fecha_desde",
+                  "value": "2024-01-01",
+                  "description": "Opcional (Y-m-d)"
+                },
+                {
+                  "key": "fecha_hasta",
+                  "value": "2024-12-31",
+                  "description": "Opcional (Y-m-d)"
+                },
+                {
+                  "key": "detalle",
+                  "value": "medicación",
+                  "description": "Opcional (búsqueda parcial)",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Crear Historial",
+      "item": [
+        {
+          "name": "Crear Historial Básico",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"detalle\": \"Paciente tomó desayuno completo sin complicaciones\",\n  \"id_paciente\": 1,\n  \"id_cuidador\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/historiales-cuidador",
+              "host": ["{{baseUrl}}"],
+              "path": ["historiales-cuidador"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear con Fecha Personalizada",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"detalle\": \"Paciente realizó ejercicios de rehabilitación por 30 minutos\",\n  \"id_paciente\": 1,\n  \"id_cuidador\": 1,\n  \"fecha_historial\": \"2024-01-15 14:30:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/historiales-cuidador",
+              "host": ["{{baseUrl}}"],
+              "path": ["historiales-cuidador"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Actualizar Historial",
+      "item": [
+        {
+          "name": "Actualizar Detalle",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"detalle\": \"Paciente mostró excelente progreso en la rehabilitación\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/historiales-cuidador/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["historiales-cuidador", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Fecha y Detalle",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"detalle\": \"Paciente completó todos los ejercicios asignados\",\n  \"fecha_historial\": \"2024-01-15 15:00:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/historiales-cuidador/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["historiales-cuidador", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Estadísticas",
+      "item": [
+        {
+          "name": "Estadísticas por Paciente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/historiales-cuidador/estadisticas/paciente/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["historiales-cuidador", "estadisticas", "paciente", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. Eliminar Historial",
+      "item": [
+        {
+          "name": "Eliminar por ID (Solo Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/historiales-cuidador/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["historiales-cuidador", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "tu_jwt_token_aqui",
+      "type": "string"
+    }
+  ]
+}

@@ -1,0 +1,282 @@
+{
+  "info": {
+    "name": "Recetas Médicas API",
+    "description": "Colección de endpoints para gestión de recetas médicas",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "receta_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "medico_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Obtener todas las recetas",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/recetas-medicas?limit=10&offset=0",
+          "host": ["{{baseUrl}}"],
+          "path": ["recetas-medicas"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            },
+            {
+              "key": "offset",
+              "value": "0"
+            }
+          ]
+        },
+        "description": "Obtiene todas las recetas médicas con paginación opcional"
+      }
+    },
+    {
+      "name": "2. Obtener receta por ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/recetas-medicas/{{receta_id}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["recetas-medicas", "{{receta_id}}"]
+        },
+        "description": "Obtiene una receta específica por su ID con todos los detalles"
+      }
+    },
+    {
+      "name": "3. Obtener recetas por médico",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/recetas-medicas/medico/{{medico_id}}?limit=20&offset=0",
+          "host": ["{{baseUrl}}"],
+          "path": ["recetas-medicas", "medico", "{{medico_id}}"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "20"
+            },
+            {
+              "key": "offset",
+              "value": "0"
+            }
+          ]
+        },
+        "description": "Obtiene todas las recetas de un médico específico"
+      }
+    },
+    {
+      "name": "4. Obtener mis recetas (médico autenticado)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/recetas-medicas/mis-recetas?limit=20&offset=0",
+          "host": ["{{baseUrl}}"],
+          "path": ["recetas-medicas", "mis-recetas"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "20"
+            },
+            {
+              "key": "offset",
+              "value": "0"
+            }
+          ]
+        },
+        "description": "Obtiene las recetas del médico autenticado (solo para rol Medico)"
+      }
+    },
+    {
+      "name": "5. Buscar recetas con filtros",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/recetas-medicas/buscar?id_medico={{medico_id}}&fecha_desde=2024-01-01&fecha_hasta=2024-12-31&detalle=paracetamol&limit=10&offset=0",
+          "host": ["{{baseUrl}}"],
+          "path": ["recetas-medicas", "buscar"],
+          "query": [
+            {
+              "key": "id_medico",
+              "value": "{{medico_id}}",
+              "description": "ID del médico (opcional)"
+            },
+            {
+              "key": "fecha_desde",
+              "value": "2024-01-01",
+              "description": "Fecha desde (YYYY-MM-DD, opcional)"
+            },
+            {
+              "key": "fecha_hasta",
+              "value": "2024-12-31",
+              "description": "Fecha hasta (YYYY-MM-DD, opcional)"
+            },
+            {
+              "key": "detalle",
+              "value": "paracetamol",
+              "description": "Búsqueda en detalle (opcional)"
+            },
+            {
+              "key": "limit",
+              "value": "10",
+              "description": "Límite de resultados (opcional)"
+            },
+            {
+              "key": "offset",
+              "value": "0",
+              "description": "Offset para paginación (opcional)"
+            }
+          ]
+        },
+        "description": "Búsqueda avanzada de recetas con múltiples filtros"
+      }
+    },
+    {
+      "name": "6. Obtener estadísticas por médico",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/recetas-medicas/estadisticas/medico/{{medico_id}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["recetas-medicas", "estadisticas", "medico", "{{medico_id}}"]
+        },
+        "description": "Obtiene estadísticas de recetas de un médico (total y último mes)"
+      }
+    },
+    {
+      "name": "7. Crear receta médica",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"detalle\": \"Paracetamol 500mg cada 8 horas por 5 días\",\n  \"fecha\": \"2024-01-15\",\n  \"id_medico\": 1\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/recetas-medicas",
+          "host": ["{{baseUrl}}"],
+          "path": ["recetas-medicas"]
+        },
+        "description": "Crea una nueva receta médica.\n\nPERMISOS:\n- Médicos: Solo pueden crear con id_medico igual a su propio user_id\n- Administradores: Pueden crear para cualquier médico\n\nCAMPOS:\n- detalle: String (requerido, min 10, max 255)\n- fecha: String YYYY-MM-DD (opcional, default: hoy)\n- id_medico: Integer (requerido, debe existir y tener rol Medico)"
+      }
+    },
+    {
+      "name": "8. Actualizar receta",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"detalle\": \"Paracetamol 500mg cada 6 horas por 7 días\",\n  \"fecha\": \"2024-01-16\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/recetas-medicas/{{receta_id}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["recetas-medicas", "{{receta_id}}"]
+        },
+        "description": "Actualiza una receta existente.\n\nPERMISOS:\n- Solo el médico propietario puede editar su receta\n- Los administradores pueden editar cualquier receta\n\nCAMPOS ACTUALIZABLES:\n- detalle: String (opcional, min 10, max 255)\n- fecha: String YYYY-MM-DD (opcional)"
+      }
+    },
+    {
+      "name": "9. Eliminar receta",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/recetas-medicas/{{receta_id}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["recetas-medicas", "{{receta_id}}"]
+        },
+        "description": "Elimina una receta médica.\n\nPERMISOS:\n- Solo administradores pueden eliminar recetas"
+      }
+    }
+  ]
+}
