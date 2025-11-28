@@ -137,6 +137,7 @@ class RecetaMedicaController extends BaseController
      * 
      * Query params:
      * - id_medico: int (opcional)
+    * - id_historial: int (opcional)
      * - fecha_desde: string YYYY-MM-DD (opcional)
      * - fecha_hasta: string YYYY-MM-DD (opcional)
      * - detalle: string (opcional, búsqueda parcial)
@@ -178,7 +179,8 @@ class RecetaMedicaController extends BaseController
      * {
      *   "detalle": "Detalle de la receta (mínimo 10 caracteres)",
      *   "fecha": "2024-01-15" (opcional, default: hoy),
-     *   "id_medico": 123
+    *   "id_medico": 123,
+    *   "id_historial": 456
      * }
      */
     public function crear(): void
@@ -227,7 +229,8 @@ class RecetaMedicaController extends BaseController
      * Body JSON:
      * {
      *   "detalle": "Nuevo detalle de la receta" (opcional),
-     *   "fecha": "2024-01-20" (opcional)
+    *   "fecha": "2024-01-20" (opcional),
+    *   "id_historial": 456 (opcional)
      * }
      */
     public function actualizar(array $params): void

@@ -171,6 +171,13 @@ class RecetaMedicaRepository extends BaseRepository
             $types .= 'i';
         }
 
+        // Filtro por historial
+        if (isset($filters['id_historial']) && $filters['id_historial'] !== null) {
+            $conditions[] = "rm.id_historial = ?";
+            $params[] = $filters['id_historial'];
+            $types .= 'i';
+        }
+
         // Filtro por rango de fechas
         if (isset($filters['fecha_desde']) && $filters['fecha_desde'] !== null) {
             $conditions[] = "rm.fecha >= ?";
@@ -321,6 +328,12 @@ class RecetaMedicaRepository extends BaseRepository
             $types .= 'i';
         }
 
+        if (isset($filters['id_historial']) && $filters['id_historial'] !== null) {
+            $conditions[] = "rm.id_historial = ?";
+            $params[] = $filters['id_historial'];
+            $types .= 'i';
+        }
+
         if (isset($filters['fecha_desde']) && $filters['fecha_desde'] !== null) {
             $conditions[] = "rm.fecha >= ?";
             $params[] = $filters['fecha_desde'];
@@ -367,6 +380,24 @@ class RecetaMedicaRepository extends BaseRepository
         $query = "SELECT COUNT(*) as total FROM users WHERE id = ? AND rol = 'Medico'";
         $stmt = $this->conexion->prepare($query);
         $stmt->bind_param('i', $idMedico);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_assoc();
+
+        return $data['total'] > 0;
+    }
+
+    /**
+     * Verifica si un historial existe
+     *
+     * @param int $idHistorial
+     * @return bool
+     */
+    public function historialExists(int $idHistorial): bool
+    {
+        $query = "SELECT COUNT(*) as total FROM historial WHERE idhistorial = ?";
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bind_param('i', $idHistorial);
         $stmt->execute();
         $result = $stmt->get_result();
         $data = $result->fetch_assoc();

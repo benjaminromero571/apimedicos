@@ -17,6 +17,7 @@ class RecetaMedicaEntity
     private string $detalle;
     private string $fecha;
     private int $id_medico;
+    private int $id_historial;
     
     // Campos de auditoría
     private string $created_at;
@@ -48,6 +49,7 @@ class RecetaMedicaEntity
         $this->detalle = $data['detalle'] ?? '';
         $this->fecha = $data['fecha'] ?? date('Y-m-d');
         $this->id_medico = isset($data['id_medico']) ? (int)$data['id_medico'] : 0;
+        $this->id_historial = isset($data['id_historial']) ? (int)$data['id_historial'] : 0;
         
         $this->created_at = $data['created_at'] ?? date('Y-m-d H:i:s');
         $this->created_by = isset($data['created_by']) ? (int)$data['created_by'] : 0;
@@ -75,6 +77,7 @@ class RecetaMedicaEntity
             'created_by' => $this->created_by,
             'updated_at' => $this->updated_at,
             'updated_by' => $this->updated_by,
+            'id_historial' => $this->id_historial,
             'nombre_medico' => $this->nombre_medico,
             'email_medico' => $this->email_medico,
             'created_by_name' => $this->created_by_name,
@@ -102,6 +105,11 @@ class RecetaMedicaEntity
     public function getIdMedico(): int
     {
         return $this->id_medico;
+    }
+
+    public function getIdHistorial(): int
+    {
+        return $this->id_historial;
     }
 
     public function getCreatedAt(): string
@@ -166,6 +174,11 @@ class RecetaMedicaEntity
         $this->id_medico = $id_medico;
     }
 
+    public function setIdHistorial(int $id_historial): void
+    {
+        $this->id_historial = $id_historial;
+    }
+
     public function setCreatedAt(string $created_at): void
     {
         $this->created_at = $created_at;
@@ -215,7 +228,8 @@ class RecetaMedicaEntity
     {
         return !empty($this->detalle) 
             && !empty($this->fecha)
-            && $this->id_medico > 0;
+            && $this->id_medico > 0
+            && $this->id_historial > 0;
     }
 
     /**
@@ -237,6 +251,10 @@ class RecetaMedicaEntity
         
         if ($this->id_medico <= 0) {
             $errors[] = 'El ID del médico es inválido';
+        }
+
+        if ($this->id_historial <= 0) {
+            $errors[] = 'El ID del historial es inválido';
         }
         
         return $errors;

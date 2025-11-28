@@ -16,6 +16,7 @@ class RecetaMedicaDto
     private string $detalle;
     private string $fecha;
     private int $id_medico;
+    private int $id_historial;
     private ?string $nombre_medico;
     private string $created_at;
 
@@ -24,6 +25,7 @@ class RecetaMedicaDto
         string $detalle,
         string $fecha,
         int $id_medico,
+        int $id_historial,
         ?string $nombre_medico = null,
         string $created_at = ''
     ) {
@@ -31,6 +33,7 @@ class RecetaMedicaDto
         $this->detalle = $detalle;
         $this->fecha = $fecha;
         $this->id_medico = $id_medico;
+        $this->id_historial = $id_historial;
         $this->nombre_medico = $nombre_medico;
         $this->created_at = $created_at;
     }
@@ -45,6 +48,7 @@ class RecetaMedicaDto
             $entity->getDetalle(),
             $entity->getFecha(),
             $entity->getIdMedico(),
+            $entity->getIdHistorial(),
             $entity->getNombreMedico(),
             $entity->getCreatedAt()
         );
@@ -60,6 +64,7 @@ class RecetaMedicaDto
             'detalle' => $this->detalle,
             'fecha' => $this->fecha,
             'id_medico' => $this->id_medico,
+            'id_historial' => $this->id_historial,
             'nombre_medico' => $this->nombre_medico,
             'created_at' => $this->created_at
         ];
@@ -70,6 +75,7 @@ class RecetaMedicaDto
     public function getDetalle(): string { return $this->detalle; }
     public function getFecha(): string { return $this->fecha; }
     public function getIdMedico(): int { return $this->id_medico; }
+    public function getIdHistorial(): int { return $this->id_historial; }
     public function getNombreMedico(): ?string { return $this->nombre_medico; }
     public function getCreatedAt(): string { return $this->created_at; }
 }

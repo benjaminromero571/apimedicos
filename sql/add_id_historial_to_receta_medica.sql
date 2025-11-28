@@ -1,0 +1,1 @@
+ALTER TABLE `receta_medica` ADD `id_historial` INT NOT NULL AFTER `updated_by`;

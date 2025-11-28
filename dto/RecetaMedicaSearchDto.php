@@ -11,6 +11,7 @@ declare(strict_types=1);
 class RecetaMedicaSearchDto
 {
     private ?int $id_medico;
+    private ?int $id_historial;
     private ?string $fecha_desde;
     private ?string $fecha_hasta;
     private ?string $detalle_busqueda;
@@ -24,6 +25,10 @@ class RecetaMedicaSearchDto
     {
         $this->id_medico = isset($filters['id_medico']) && $filters['id_medico'] !== '' 
             ? $this->validatePositiveInt($filters['id_medico'], 'id_medico') 
+            : null;
+
+        $this->id_historial = isset($filters['id_historial']) && $filters['id_historial'] !== ''
+            ? $this->validatePositiveInt($filters['id_historial'], 'id_historial')
             : null;
 
         $this->fecha_desde = isset($filters['fecha_desde']) && $filters['fecha_desde'] !== '' 
@@ -106,6 +111,7 @@ class RecetaMedicaSearchDto
     public function hasFilters(): bool
     {
         return $this->id_medico !== null 
+            || $this->id_historial !== null
             || $this->fecha_desde !== null 
             || $this->fecha_hasta !== null
             || $this->detalle_busqueda !== null;
@@ -120,6 +126,10 @@ class RecetaMedicaSearchDto
 
         if ($this->id_medico !== null) {
             $conditions[] = "rm.id_medico = {$this->id_medico}";
+        }
+
+        if ($this->id_historial !== null) {
+            $conditions[] = "rm.id_historial = {$this->id_historial}";
         }
 
         if ($this->fecha_desde !== null) {
@@ -140,6 +150,7 @@ class RecetaMedicaSearchDto
 
     // Getters
     public function getIdMedico(): ?int { return $this->id_medico; }
+    public function getIdHistorial(): ?int { return $this->id_historial; }
     public function getFechaDesde(): ?string { return $this->fecha_desde; }
     public function getFechaHasta(): ?string { return $this->fecha_hasta; }
     public function getDetalleBusqueda(): ?string { return $this->detalle_busqueda; }

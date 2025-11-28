@@ -13,6 +13,7 @@ class CreateRecetaMedicaDto
     private string $detalle;
     private ?string $fecha;
     private int $id_medico;
+    private int $id_historial;
     private int $created_by;
 
     /**
@@ -24,6 +25,7 @@ class CreateRecetaMedicaDto
         $this->detalle = $this->validateRequired($data, 'detalle', 'El detalle de la receta es requerido');
         $this->id_medico = $this->validateIntRequired($data, 'id_medico', 'El ID del médico es requerido');
         $this->created_by = $this->validateIntRequired($data, 'created_by', 'El ID del creador es requerido');
+        $this->id_historial = $this->validateIntRequired($data, 'id_historial', 'El ID del historial es requerido');
         
         // fecha es opcional, si no se proporciona se usará CURRENT_TIMESTAMP de MySQL
         $this->fecha = $data['fecha'] ?? null;
@@ -96,6 +98,7 @@ class CreateRecetaMedicaDto
         $data = [
             'detalle' => $this->detalle,
             'id_medico' => $this->id_medico,
+            'id_historial' => $this->id_historial,
             'created_by' => $this->created_by,
             'updated_by' => $this->created_by // Al crear, updated_by es igual a created_by
         ];
@@ -112,5 +115,6 @@ class CreateRecetaMedicaDto
     public function getDetalle(): string { return $this->detalle; }
     public function getFecha(): ?string { return $this->fecha; }
     public function getIdMedico(): int { return $this->id_medico; }
+    public function getIdHistorial(): int { return $this->id_historial; }
     public function getCreatedBy(): int { return $this->created_by; }
 }

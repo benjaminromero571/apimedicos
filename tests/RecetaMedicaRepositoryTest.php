@@ -18,6 +18,7 @@ class RecetaMedicaRepositoryTest
     private RecetaMedicaRepository $repository;
     private $testRecetaId = null;
     private $testMedicoId = 1; // Asume que existe un médico con ID 1
+    private $testHistorialId = 1; // Asume que existe un historial con ID 1
     
     public function __construct()
     {
@@ -36,7 +37,8 @@ class RecetaMedicaRepositoryTest
             'fecha' => date('Y-m-d'),
             'id_medico' => $this->testMedicoId,
             'created_by' => $this->testMedicoId,
-            'updated_by' => $this->testMedicoId
+            'updated_by' => $this->testMedicoId,
+            'id_historial' => $this->testHistorialId
         ];
 
         try {
@@ -145,6 +147,7 @@ class RecetaMedicaRepositoryTest
         try {
             $filters = [
                 'id_medico' => $this->testMedicoId,
+                'id_historial' => $this->testHistorialId,
                 'fecha_desde' => date('Y-m-d', strtotime('-30 days')),
                 'fecha_hasta' => date('Y-m-d')
             ];

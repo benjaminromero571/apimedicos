@@ -24,7 +24,7 @@
 $router->get('/recetas-medicas', 'RecetaMedicaController@obtenerTodas');
 
 // Buscar recetas con filtros complejos
-// GET /recetas-medicas/buscar?id_medico=1&fecha_desde=2024-01-01&fecha_hasta=2024-12-31&detalle=paracetamol
+// GET /recetas-medicas/buscar?id_medico=1&id_historial=10&fecha_desde=2024-01-01&fecha_hasta=2024-12-31&detalle=paracetamol
 $router->get('/recetas-medicas/buscar', 'RecetaMedicaController@buscar');
 
 // Obtener recetas del médico autenticado (solo para médicos)
@@ -52,7 +52,8 @@ $router->get('/recetas-medicas/estadisticas/medico/{id}', 'RecetaMedicaControlle
 // {
 //   "detalle": "Paracetamol 500mg cada 8 horas por 5 días",
 //   "fecha": "2024-01-15" (opcional, default: hoy),
-//   "id_medico": 123
+//   "id_medico": 123,
+//   "id_historial": 456
 // }
 $router->post('/recetas-medicas', 'RecetaMedicaController@crear');
 
@@ -62,7 +63,8 @@ $router->post('/recetas-medicas', 'RecetaMedicaController@crear');
 // Body:
 // {
 //   "detalle": "Paracetamol 500mg cada 6 horas por 7 días" (opcional),
-//   "fecha": "2024-01-16" (opcional)
+//   "fecha": "2024-01-16" (opcional),
+//   "id_historial": 456 (opcional)
 // }
 $router->put('/recetas-medicas/{id}', 'RecetaMedicaController@actualizar');
 

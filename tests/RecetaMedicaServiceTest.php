@@ -19,6 +19,7 @@ class RecetaMedicaServiceTest
     private RecetaMedicaService $service;
     private $testRecetaId = null;
     private $testMedicoId = 1; // Asume que existe un médico con ID 1
+    private $testHistorialId = 1; // Asume que existe un historial con ID 1
     
     public function __construct()
     {
@@ -37,7 +38,8 @@ class RecetaMedicaServiceTest
                 'detalle' => 'Ibuprofeno 400mg cada 8 horas por 3 días - TEST SERVICE',
                 'fecha' => date('Y-m-d'),
                 'id_medico' => $this->testMedicoId,
-                'created_by' => $this->testMedicoId
+                'created_by' => $this->testMedicoId,
+                'id_historial' => $this->testHistorialId
             ];
             
             $createDto = new CreateRecetaMedicaDto($data);
@@ -69,7 +71,8 @@ class RecetaMedicaServiceTest
                 'detalle' => 'Intento de crear receta como cuidador',
                 'fecha' => date('Y-m-d'),
                 'id_medico' => $this->testMedicoId,
-                'created_by' => 999
+                'created_by' => 999,
+                'id_historial' => $this->testHistorialId
             ];
             
             $createDto = new CreateRecetaMedicaDto($data);
@@ -99,7 +102,8 @@ class RecetaMedicaServiceTest
                 'detalle' => 'Intento de crear receta para otro médico',
                 'fecha' => date('Y-m-d'),
                 'id_medico' => 999, // Otro médico
-                'created_by' => $this->testMedicoId
+                'created_by' => $this->testMedicoId,
+                'id_historial' => $this->testHistorialId
             ];
             
             $createDto = new CreateRecetaMedicaDto($data);

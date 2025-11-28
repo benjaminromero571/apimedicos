@@ -178,6 +178,9 @@ class RecetaMedicaService
             if ($searchDto->getIdMedico() !== null) {
                 $filters['id_medico'] = $searchDto->getIdMedico();
             }
+            if ($searchDto->getIdHistorial() !== null) {
+                $filters['id_historial'] = $searchDto->getIdHistorial();
+            }
             if ($searchDto->getFechaDesde() !== null) {
                 $filters['fecha_desde'] = $searchDto->getFechaDesde();
             }
@@ -254,6 +257,15 @@ class RecetaMedicaService
                 return [
                     'success' => false,
                     'message' => 'El médico especificado no existe o no tiene rol de Medico',
+                    'data' => null
+                ];
+            }
+
+            // Verificar que el historial existe
+            if (!$this->repository->historialExists($createDto->getIdHistorial())) {
+                return [
+                    'success' => false,
+                    'message' => 'El historial especificado no existe',
                     'data' => null
                 ];
             }
@@ -339,7 +351,7 @@ class RecetaMedicaService
             }
 
             // Validar campos permitidos para actualización
-            $allowedFields = ['detalle', 'fecha'];
+            $allowedFields = ['detalle', 'fecha', 'id_historial'];
             $updateData = [];
 
             foreach ($allowedFields as $field) {
@@ -387,6 +399,27 @@ class RecetaMedicaService
                         'data' => null
                     ];
                 }
+            }
+
+            if (isset($updateData['id_historial'])) {
+                $idHistorial = filter_var($updateData['id_historial'], FILTER_VALIDATE_INT);
+                if ($idHistorial === false || $idHistorial <= 0) {
+                    return [
+                        'success' => false,
+                        'message' => 'El ID de historial debe ser un entero positivo',
+                        'data' => null
+                    ];
+                }
+
+                if (!$this->repository->historialExists($idHistorial)) {
+                    return [
+                        'success' => false,
+                        'message' => 'El historial especificado no existe',
+                        'data' => null
+                    ];
+                }
+
+                $updateData['id_historial'] = $idHistorial;
             }
 
             // Actualizar la receta

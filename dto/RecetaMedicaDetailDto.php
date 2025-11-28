@@ -16,6 +16,7 @@ class RecetaMedicaDetailDto
     private string $detalle;
     private string $fecha;
     private int $id_medico;
+    private int $id_historial;
     private ?string $nombre_medico;
     private ?string $email_medico;
     private string $created_at;
@@ -30,6 +31,7 @@ class RecetaMedicaDetailDto
         string $detalle,
         string $fecha,
         int $id_medico,
+        int $id_historial,
         ?string $nombre_medico,
         ?string $email_medico,
         string $created_at,
@@ -43,6 +45,7 @@ class RecetaMedicaDetailDto
         $this->detalle = $detalle;
         $this->fecha = $fecha;
         $this->id_medico = $id_medico;
+        $this->id_historial = $id_historial;
         $this->nombre_medico = $nombre_medico;
         $this->email_medico = $email_medico;
         $this->created_at = $created_at;
@@ -63,6 +66,7 @@ class RecetaMedicaDetailDto
             $entity->getDetalle(),
             $entity->getFecha(),
             $entity->getIdMedico(),
+            $entity->getIdHistorial(),
             $entity->getNombreMedico(),
             $entity->getEmailMedico(),
             $entity->getCreatedAt(),
@@ -88,6 +92,9 @@ class RecetaMedicaDetailDto
                 'nombre' => $this->nombre_medico,
                 'email' => $this->email_medico
             ],
+            'historial' => [
+                'id' => $this->id_historial
+            ],
             'auditoria' => [
                 'created_at' => $this->created_at,
                 'created_by' => $this->created_by,
@@ -104,6 +111,7 @@ class RecetaMedicaDetailDto
     public function getDetalle(): string { return $this->detalle; }
     public function getFecha(): string { return $this->fecha; }
     public function getIdMedico(): int { return $this->id_medico; }
+    public function getIdHistorial(): int { return $this->id_historial; }
     public function getNombreMedico(): ?string { return $this->nombre_medico; }
     public function getEmailMedico(): ?string { return $this->email_medico; }
     public function getCreatedAt(): string { return $this->created_at; }
