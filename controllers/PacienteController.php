@@ -29,6 +29,33 @@ class PacienteController extends BaseController
     }
 
     /**
+     * Obtiene todos los pacientes con paginación
+     */
+    public function obtenerTodosPaginados($params = [])
+    {
+        try {
+            $limit = isset($params['limit']) ? (int)$params['limit'] : null;
+            $offset = isset($params['offset']) ? (int)$params['offset'] : 0;
+            
+            $result = $this->pacienteService->getAllPaginated($limit, $offset);
+            
+            if ($result['success']) {
+                $response = [
+                    'data' => array_map(function($dto) {
+                        return $dto->toArray();
+                    }, $result['data']),
+                    'pagination' => $result['pagination']
+                ];
+                $this->jsonResponse($response, $result['message']);
+            } else {
+                $this->jsonError($result['message'], 500);
+            }
+        } catch (Exception $e) {
+            $this->jsonError("Error al obtener pacientes: " . $e->getMessage(), 500);
+        }
+    }
+
+    /**
      * Obtiene un paciente por ID
      */
     public function obtenerPorId($params)

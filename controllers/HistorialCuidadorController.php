@@ -48,7 +48,11 @@ class HistorialCuidadorController extends BaseController
             $result = $this->service->getAllHistoriales($limit, $offset);
             
             if ($result['success']) {
-                $this->jsonResponse($result['data'], $result['message']);
+                $response = [
+                    'data' => $result['data'],
+                    'pagination' => $result['pagination'] ?? null
+                ];
+                $this->jsonResponse($response, $result['message']);
             } else {
                 $this->jsonError($result['message'], 500);
             }
@@ -108,7 +112,11 @@ class HistorialCuidadorController extends BaseController
             $result = $this->service->getHistorialesByPaciente($idPaciente, $limit, $offset);
             
             if ($result['success']) {
-                $this->jsonResponse($result['data'], $result['message']);
+                $response = [
+                    'data' => $result['data'],
+                    'pagination' => $result['pagination'] ?? null
+                ];
+                $this->jsonResponse($response, $result['message']);
             } else {
                 $statusCode = $result['message'] === 'El paciente no existe' ? 404 : 400;
                 $this->jsonError($result['message'], $statusCode);
@@ -142,7 +150,11 @@ class HistorialCuidadorController extends BaseController
             $result = $this->service->getHistorialesByCuidador($idCuidador, $limit, $offset);
             
             if ($result['success']) {
-                $this->jsonResponse($result['data'], $result['message']);
+                $response = [
+                    'data' => $result['data'],
+                    'pagination' => $result['pagination'] ?? null
+                ];
+                $this->jsonResponse($response, $result['message']);
             } else {
                 $statusCode = $result['message'] === 'El cuidador no existe' ? 404 : 400;
                 $this->jsonError($result['message'], $statusCode);
@@ -368,6 +380,48 @@ class HistorialCuidadorController extends BaseController
                 $this->jsonResponse($result['data'], $result['message']);
             } else {
                 $this->jsonError($result['message'], 400);
+            }
+
+        } catch (Exception $e) {
+            $this->jsonError("Error interno del servidor: " . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * GET /historiales-cuidador/cuidador-asignado/:id
+     * Obtiene los historiales de pacientes asignados a un cuidador específico
+     * 
+     * Retorna todos los historiales de los pacientes que tienen al menos un historial
+     * creado por el cuidador especificado.
+     * 
+     * Query params:
+     * - limit: int (opcional)
+     * - offset: int (opcional, default: 0)
+     */
+    public function historialesPacientesAsignadosPorCuidador(array $params): void
+    {
+        try {
+            if (!isset($params['id']) || empty($params['id'])) {
+                $this->jsonError("ID de cuidador requerido", 400);
+                return;
+            }
+
+            $idCuidador = (int)$params['id'];
+            $limit = isset($params['limit']) ? (int)$params['limit'] : null;
+            $offset = isset($params['offset']) ? (int)$params['offset'] : 0;
+            $idPaciente = isset($params['id_paciente']) && is_numeric($params['id_paciente']) ? (int)$params['id_paciente'] : null;
+            
+            $result = $this->service->getHistorialesPacientesAsignadosByCuidador($idCuidador, $limit, $offset, $idPaciente);
+            
+            if ($result['success']) {
+                $response = [
+                    'data' => $result['data'],
+                    'pagination' => $result['pagination'] ?? null
+                ];
+                $this->jsonResponse($response, $result['message']);
+            } else {
+                $statusCode = $result['message'] === 'El cuidador no existe' ? 404 : 400;
+                $this->jsonError($result['message'], $statusCode);
             }
 
         } catch (Exception $e) {

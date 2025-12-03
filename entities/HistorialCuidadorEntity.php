@@ -15,7 +15,9 @@ class HistorialCuidadorEntity
 {
     private ?int $id;
     private string $fecha_historial;
+    private ?string $fecha_historial_timestamp;
     private string $detalle;
+    private ?array $registro;
     private int $id_paciente;
     private int $id_cuidador;
     
@@ -47,7 +49,9 @@ class HistorialCuidadorEntity
     {
         $this->id = isset($data['id']) ? (int)$data['id'] : null;
         $this->fecha_historial = $data['fecha_historial'] ?? '';
+        $this->fecha_historial_timestamp = $data['fecha_historial_timestamp'] ?? null;
         $this->detalle = $data['detalle'] ?? '';
+        $this->registro = isset($data['registro']) ? (is_string($data['registro']) ? json_decode($data['registro'], true) : $data['registro']) : null;
         $this->id_paciente = isset($data['id_paciente']) ? (int)$data['id_paciente'] : 0;
         $this->id_cuidador = isset($data['id_cuidador']) ? (int)$data['id_cuidador'] : 0;
         
@@ -71,7 +75,9 @@ class HistorialCuidadorEntity
         return [
             'id' => $this->id,
             'fecha_historial' => $this->fecha_historial,
+            'fecha_historial_timestamp' => $this->fecha_historial_timestamp,
             'detalle' => $this->detalle,
+            'registro' => $this->registro,
             'id_paciente' => $this->id_paciente,
             'id_cuidador' => $this->id_cuidador,
             'created_at' => $this->created_at,
@@ -97,9 +103,19 @@ class HistorialCuidadorEntity
         return $this->fecha_historial;
     }
 
+    public function getFechaHistorialTimestamp(): ?string
+    {
+        return $this->fecha_historial_timestamp;
+    }
+
     public function getDetalle(): string
     {
         return $this->detalle;
+    }
+
+    public function getRegistro(): ?array
+    {
+        return $this->registro;
     }
 
     public function getIdPaciente(): int
@@ -164,9 +180,19 @@ class HistorialCuidadorEntity
         $this->fecha_historial = $fecha_historial;
     }
 
+    public function setFechaHistorialTimestamp(?string $fecha_historial_timestamp): void
+    {
+        $this->fecha_historial_timestamp = $fecha_historial_timestamp;
+    }
+
     public function setDetalle(string $detalle): void
     {
         $this->detalle = $detalle;
+    }
+
+    public function setRegistro(?array $registro): void
+    {
+        $this->registro = $registro;
     }
 
     public function setIdPaciente(int $id_paciente): void

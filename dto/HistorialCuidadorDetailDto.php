@@ -14,7 +14,9 @@ class HistorialCuidadorDetailDto
 {
     private int $id;
     private string $fecha_historial;
+    private ?string $fecha_historial_timestamp;
     private string $detalle;
+    private ?array $registro;
     private int $id_paciente;
     private int $id_cuidador;
     private ?string $nombre_paciente;
@@ -32,7 +34,9 @@ class HistorialCuidadorDetailDto
     {
         $this->id = (int)$data['id'];
         $this->fecha_historial = $data['fecha_historial'];
+        $this->fecha_historial_timestamp = $data['fecha_historial_timestamp'] ?? null;
         $this->detalle = $data['detalle'];
+        $this->registro = isset($data['registro']) ? (is_array($data['registro']) ? $data['registro'] : []) : null;
         $this->id_paciente = (int)$data['id_paciente'];
         $this->id_cuidador = (int)$data['id_cuidador'];
         $this->nombre_paciente = $data['nombre_paciente'] ?? null;
@@ -62,7 +66,9 @@ class HistorialCuidadorDetailDto
         return [
             'id' => $this->id,
             'fecha_historial' => $this->fecha_historial,
+            'fecha_historial_timestamp' => $this->fecha_historial_timestamp,
             'detalle' => $this->detalle,
+            'registro' => $this->registro,
             'paciente' => [
                 'id' => $this->id_paciente,
                 'nombre' => $this->nombre_paciente,
@@ -97,9 +103,19 @@ class HistorialCuidadorDetailDto
         return $this->fecha_historial;
     }
 
+    public function getFechaHistorialTimestamp(): ?string
+    {
+        return $this->fecha_historial_timestamp;
+    }
+
     public function getDetalle(): string
     {
         return $this->detalle;
+    }
+
+    public function getRegistro(): ?array
+    {
+        return $this->registro;
     }
 
     public function getIdPaciente(): int

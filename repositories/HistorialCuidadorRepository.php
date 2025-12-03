@@ -186,6 +186,8 @@ class HistorialCuidadorRepository extends BaseRepository
         return $historiales;
     }
 
+    
+
     /**
      * Busca historiales con criterios complejos
      * 
@@ -434,5 +436,104 @@ class HistorialCuidadorRepository extends BaseRepository
         $data = $result->fetch_assoc();
 
         return $data['total'] > 0;
+    }
+
+    /**
+     * Obtiene los historiales de pacientes asignados a un cuidador específico
+     * 
+     * Retorna todos los historiales de los pacientes que tienen al menos un historial
+     * creado por el cuidador especificado.
+     * 
+     * @param int $idCuidador ID del cuidador
+     * @param int|null $limit
+     * @param int $offset
+     * @return array Array de HistorialCuidadorEntity
+     */
+    public function getHistorialesPacientesAsignadosByCuidador(int $idCuidador, ?int $limit = null, int $offset = 0, ?int $idPaciente = null): array
+    {
+        $query = "
+            SELECT 
+                hc.*,
+                p.nompaciente as nombre_paciente,
+                c.name as nombre_cuidador,
+                u1.name as created_by_name,
+                u2.name as updated_by_name
+            FROM {$this->table} hc
+            LEFT JOIN pacientes p ON hc.id_paciente = p.idpaciente
+            LEFT JOIN users c ON hc.id_cuidador = c.id
+            LEFT JOIN users u1 ON hc.created_by = u1.id
+            LEFT JOIN users u2 ON hc.updated_by = u2.id
+            WHERE hc.id_paciente IN (
+                SELECT DISTINCT id_paciente 
+                FROM historial_cuidador 
+                WHERE id_cuidador = ?
+            )
+        ";
+
+        // Filtro opcional por paciente
+        $params = [$idCuidador];
+        $types = 'i';
+        if ($idPaciente !== null && $idPaciente > 0) {
+            $query .= " AND hc.id_paciente = ?";
+            $params[] = $idPaciente;
+            $types .= 'i';
+        }
+
+        $query .= " ORDER BY hc.fecha_historial DESC, hc.created_at DESC";
+
+        if ($limit !== null) {
+            $query .= " LIMIT ? OFFSET ?";
+            $params[] = $limit;
+            $params[] = $offset;
+            $types .= 'ii';
+        }
+
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bind_param($types, ...$params);
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $historiales = [];
+        while ($data = $result->fetch_assoc()) {
+            $historiales[] = new HistorialCuidadorEntity($data);
+        }
+
+        return $historiales;
+    }
+
+    /**
+     * Cuenta historiales de pacientes asignados a un cuidador, con filtro opcional por paciente
+     *
+     * @param int $idCuidador
+     * @param int|null $idPaciente
+     * @return int Total de registros
+     */
+    public function countHistorialesPacientesAsignadosByCuidador(int $idCuidador, ?int $idPaciente = null): int
+    {
+        $query = "
+            SELECT COUNT(*) as total
+            FROM {$this->table} hc
+            WHERE hc.id_paciente IN (
+                SELECT DISTINCT id_paciente 
+                FROM historial_cuidador 
+                WHERE id_cuidador = ?
+            )
+        ";
+
+        $params = [$idCuidador];
+        $types = 'i';
+        if ($idPaciente !== null && $idPaciente > 0) {
+            $query .= " AND hc.id_paciente = ?";
+            $params[] = $idPaciente;
+            $types .= 'i';
+        }
+
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_assoc();
+        return (int)($data['total'] ?? 0);
     }
 }

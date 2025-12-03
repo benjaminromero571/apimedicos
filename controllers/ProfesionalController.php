@@ -38,6 +38,33 @@ class ProfesionalController extends BaseController
     }
 
     /**
+     * Obtiene todos los profesionales con paginación
+     */
+    public function obtenerTodosPaginados($params = [])
+    {
+        try {
+            $limit = isset($params['limit']) ? (int)$params['limit'] : null;
+            $offset = isset($params['offset']) ? (int)$params['offset'] : 0;
+            $orderBy = isset($params['orderBy']) ? $params['orderBy'] : 'nombre ASC';
+            
+            $result = $this->profesionalService->getAllProfesionalesPaginated($limit, $offset, $orderBy);
+            
+            if ($result['success']) {
+                $response = [
+                    'data' => $result['data'],
+                    'pagination' => $result['pagination']
+                ];
+                $this->jsonResponse($response, $result['message']);
+            } else {
+                $this->jsonError($result['message'], 500);
+            }
+
+        } catch (Exception $e) {
+            $this->jsonError("Error interno del servidor: " . $e->getMessage(), 500);
+        }
+    }
+
+    /**
      * Obtiene un profesional por ID con detalles completos
      */
     public function obtenerPorId($params)

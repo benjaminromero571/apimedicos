@@ -33,6 +33,10 @@ $router->get('/historiales-cuidador/paciente/{id}', 'HistorialCuidadorController
 // GET /historiales-cuidador/cuidador/789?limit=20&offset=0
 $router->get('/historiales-cuidador/cuidador/{id}', 'HistorialCuidadorController@obtenerPorCuidador');
 
+// Obtener historiales de pacientes asignados a un cuidador
+// GET /historiales-cuidador/cuidador-asignado/789?limit=20&offset=0&id_paciente=456
+$router->get('/historiales-cuidador/cuidador-asignado/{id}', 'HistorialCuidadorController@historialesPacientesAsignadosPorCuidador');
+
 // Obtener estadísticas de historiales por paciente
 // GET /historiales-cuidador/estadisticas/paciente/456
 $router->get('/historiales-cuidador/estadisticas/paciente/{id}', 'HistorialCuidadorController@estadisticasPorPaciente');

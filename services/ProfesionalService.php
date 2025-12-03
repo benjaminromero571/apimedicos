@@ -5,6 +5,7 @@ require_once __DIR__ . '/../dto/ProfesionalDto.php';
 require_once __DIR__ . '/../dto/CreateProfesionalDto.php';
 require_once __DIR__ . '/../dto/ProfesionalSearchDto.php';
 require_once __DIR__ . '/../dto/ProfesionalDetailDto.php';
+require_once __DIR__ . '/../core/Pagination.php';
 
 /**
  * Servicio para gestión de profesionales médicos
@@ -45,6 +46,46 @@ class ProfesionalService
                 'message' => 'Profesionales obtenidos correctamente',
                 'data' => $profesionales,
                 'total' => count($profesionales)
+            ];
+
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Error al obtener profesionales: ' . $e->getMessage(),
+                'data' => []
+            ];
+        }
+    }
+
+    /**
+     * Obtiene todos los profesionales con paginación
+     */
+    public function getAllProfesionalesPaginated(?int $limit = null, int $offset = 0, $orderBy = 'nombre ASC')
+    {
+        try {
+            $total = $this->profesionalRepository->countAll();
+            $entities = $this->profesionalRepository->getAll($orderBy, $limit, $offset);
+            
+            if (!$entities) {
+                return [
+                    'success' => false,
+                    'message' => 'No se pudieron obtener los profesionales',
+                    'data' => []
+                ];
+            }
+
+            $profesionales = [];
+            foreach ($entities as $entity) {
+                $profesionales[] = ProfesionalDto::fromEntity($entity);
+            }
+
+            $pagination = \Core\Pagination::build($limit, $offset, $total);
+
+            return [
+                'success' => true,
+                'message' => 'Profesionales obtenidos correctamente',
+                'data' => $profesionales,
+                'pagination' => $pagination
             ];
 
         } catch (Exception $e) {

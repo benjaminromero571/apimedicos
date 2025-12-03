@@ -177,6 +177,17 @@ class PacienteRepository extends BaseRepository
     }
 
     /**
+     * Cuenta el total de pacientes
+     */
+    public function countAll()
+    {
+        $query = "SELECT COUNT(*) as total FROM {$this->table}";
+        $result = $this->executeQuery($query);
+        $data = $result->fetch_assoc();
+        return (int)$data['total'];
+    }
+
+    /**
      * Obtiene pacientes con sus asignaciones
      */
     public function findWithAsignaciones($pacienteId = null)

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../repositories/HistorialCuidadorRepository.php';
+require_once __DIR__ . '/../core/Pagination.php';
 require_once __DIR__ . '/../dto/HistorialCuidadorDto.php';
 require_once __DIR__ . '/../dto/CreateHistorialCuidadorDto.php';
 require_once __DIR__ . '/../dto/HistorialCuidadorSearchDto.php';
@@ -407,6 +408,17 @@ class HistorialCuidadorService
                 $updateData['fecha_historial'] = $data['fecha_historial'];
             }
 
+            if (isset($data['registro'])) {
+                if (!is_array($data['registro'])) {
+                    return [
+                        'success' => false,
+                        'message' => 'El registro debe ser un objeto JSON válido',
+                        'data' => null
+                    ];
+                }
+                $updateData['registro'] = json_encode($data['registro']);
+            }
+
             if (empty($updateData)) {
                 return [
                     'success' => false,
@@ -542,6 +554,63 @@ class HistorialCuidadorService
                 'success' => false,
                 'message' => 'Error al obtener estadísticas: ' . $e->getMessage(),
                 'data' => null
+            ];
+        }
+    }
+
+    /**
+     * Obtiene los historiales de pacientes asignados a un cuidador específico
+     * 
+     * Retorna todos los historiales de los pacientes que tienen al menos un historial
+     * creado por el cuidador especificado.
+     * 
+     * @param int $idCuidador ID del cuidador
+     * @param int|null $limit
+     * @param int $offset
+     * @return array Response estructurado
+     */
+    public function getHistorialesPacientesAsignadosByCuidador(int $idCuidador, ?int $limit = null, int $offset = 0, ?int $idPaciente = null): array
+    {
+        try {
+            if ($idCuidador <= 0) {
+                return [
+                    'success' => false,
+                    'message' => 'ID de cuidador inválido',
+                    'data' => []
+                ];
+            }
+
+            // Verificar que el cuidador existe
+            if (!$this->repository->cuidadorExists($idCuidador)) {
+                return [
+                    'success' => false,
+                    'message' => 'El cuidador no existe',
+                    'data' => []
+                ];
+            }
+
+            $entities = $this->repository->getHistorialesPacientesAsignadosByCuidador($idCuidador, $limit, $offset, $idPaciente);
+            
+            $historiales = [];
+            foreach ($entities as $entity) {
+                $historiales[] = HistorialCuidadorDto::fromEntity($entity);
+            }
+
+            $totalCount = $this->repository->countHistorialesPacientesAsignadosByCuidador($idCuidador, $idPaciente);
+            $pagination = \Core\Pagination::build($limit, $offset, $totalCount);
+
+            return [
+                'success' => true,
+                'message' => 'Historiales de pacientes asignados obtenidos correctamente',
+                'data' => array_map(fn($dto) => $dto->toArray(), $historiales),
+                'pagination' => $pagination
+            ];
+
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Error al obtener historiales de pacientes asignados: ' . $e->getMessage(),
+                'data' => []
             ];
         }
     }

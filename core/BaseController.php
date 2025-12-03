@@ -27,9 +27,16 @@ abstract class BaseController
         http_response_code($statusCode);
         
         $response = [
-            'success' => true,
-            'data' => $data
+            'success' => true
         ];
+
+        // Flatten common envelope structures { data, pagination }
+        if (is_array($data) && array_key_exists('data', $data) && array_key_exists('pagination', $data)) {
+            $response['data'] = $data['data'];
+            $response['pagination'] = $data['pagination'];
+        } else {
+            $response['data'] = $data;
+        }
         
         if ($message) {
             $response['message'] = $message;

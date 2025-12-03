@@ -1,6 +1,11 @@
 <?php
 // ============ RUTAS DE PROFESIONALES ============
 $router->get('/profesionales', 'ProfesionalController@obtenerTodos');
+
+// Nueva ruta paginada (no afecta la ruta existente)
+// GET /profesionales/paginated?limit=20&offset=0&orderBy=nombre%20ASC
+$router->get('/profesionales/paginated', 'ProfesionalController@obtenerTodosPaginados');
+
 $router->get('/profesionales/especialidades', 'ProfesionalController@obtenerEspecialidades');
 $router->get('/profesionales/especialidad/{especialidad}', 'ProfesionalController@obtenerPorEspecialidad');
 $router->get('/profesionales/buscar', 'ProfesionalController@buscar');

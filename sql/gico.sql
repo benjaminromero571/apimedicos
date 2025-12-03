@@ -37,6 +37,7 @@ CREATE TABLE historial_cuidador (
   id int(11) NOT NULL,
   fecha_historial date NOT NULL DEFAULT current_timestamp(),
   detalle varchar(255) NOT NULL,
+  registro JSON NOT NULL DEFAULT '{}',
   id_paciente int(11) NOT NULL,
   id_cuidador int(11) NOT NULL,
   created_at date NOT NULL DEFAULT current_timestamp(),

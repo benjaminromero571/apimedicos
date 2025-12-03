@@ -3,6 +3,11 @@
 
 // Rutas básicas de CRUD
 $router->get('/pacientes', 'PacienteController@obtenerTodos');
+
+// Nueva ruta paginada (no afecta la ruta existente)
+// GET /pacientes/paginated?limit=20&offset=0
+$router->get('/pacientes/paginated', 'PacienteController@obtenerTodosPaginados');
+
 $router->get('/pacientes/buscar', 'PacienteController@buscar');
 $router->get('/pacientes/rut/{rut}', 'PacienteController@obtenerPorRut');
 $router->get('/pacientes/{id}', 'PacienteController@obtenerPorId');

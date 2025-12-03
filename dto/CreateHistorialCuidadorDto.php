@@ -12,6 +12,7 @@ class CreateHistorialCuidadorDto
 {
     private ?string $fecha_historial;
     private string $detalle;
+    private ?array $registro;
     private int $id_paciente;
     private int $id_cuidador;
     private int $created_by;
@@ -25,7 +26,9 @@ class CreateHistorialCuidadorDto
         $this->fecha_historial = $data['fecha_historial'] ?? null;
         
         // Campos requeridos
-        $this->detalle = $this->validateRequired($data, 'detalle', 'El detalle es requerido');
+        // Inicializar detalle (permitir vacío). Si necesita ser obligatorio, usar validateRequired.
+        $this->detalle = isset($data['detalle']) ? trim((string)$data['detalle']) : '';
+        $this->registro = isset($data['registro']) ? (is_array($data['registro']) ? $data['registro'] : []) : null;
         $this->id_paciente = $this->validateIntRequired($data, 'id_paciente', 'El ID del paciente es requerido');
         $this->id_cuidador = $this->validateIntRequired($data, 'id_cuidador', 'El ID del cuidador es requerido');
         $this->created_by = $this->validateIntRequired($data, 'created_by', 'El ID del creador es requerido');
@@ -64,8 +67,8 @@ class CreateHistorialCuidadorDto
         if (strlen($this->detalle) > 255) {
             throw new InvalidArgumentException('El detalle no puede exceder 255 caracteres');
         }
-
-        if (strlen($this->detalle) < 5) {
+        // Si se proporciona detalle no vacío, exigir mínimo 5 caracteres
+        if ($this->detalle !== '' && strlen($this->detalle) < 5) {
             throw new InvalidArgumentException('El detalle debe tener al menos 5 caracteres');
         }
 
@@ -79,6 +82,11 @@ class CreateHistorialCuidadorDto
                 }
             }
         }
+
+        // Validar que registro sea un array si se proporciona
+        if ($this->registro !== null && !is_array($this->registro)) {
+            throw new InvalidArgumentException('El registro debe ser un objeto JSON válido');
+        }
     }
 
     /**
@@ -88,6 +96,7 @@ class CreateHistorialCuidadorDto
     {
         $data = [
             'detalle' => $this->detalle,
+            'registro' => $this->registro ? json_encode($this->registro) : '{}',
             'id_paciente' => $this->id_paciente,
             'id_cuidador' => $this->id_cuidador,
             'created_by' => $this->created_by,
@@ -111,6 +120,11 @@ class CreateHistorialCuidadorDto
     public function getDetalle(): string
     {
         return $this->detalle;
+    }
+
+    public function getRegistro(): ?array
+    {
+        return $this->registro;
     }
 
     public function getIdPaciente(): int

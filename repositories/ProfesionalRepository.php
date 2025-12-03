@@ -114,6 +114,17 @@ class ProfesionalRepository extends BaseRepository
     }
 
     /**
+     * Cuenta el total de profesionales
+     */
+    public function countAll()
+    {
+        $query = "SELECT COUNT(*) as total FROM {$this->table}";
+        $result = $this->conexion->query($query);
+        $data = $result->fetch_assoc();
+        return (int)$data['total'];
+    }
+
+    /**
      * Busca profesionales por nombre (búsqueda parcial)
      */
     public function searchByName($name, $limit = 20, $offset = 0)

@@ -197,6 +197,17 @@ class AsignacionRepository extends BaseRepository
     }
 
     /**
+     * Cuenta el total de asignaciones
+     */
+    public function countAll()
+    {
+        $query = "SELECT COUNT(*) as total FROM {$this->table}";
+        $result = $this->executeQuery($query);
+        $data = $result->fetch_assoc();
+        return (int)$data['total'];
+    }
+
+    /**
      * Cuenta el total de registros para paginación
      */
     public function getTotalCount()

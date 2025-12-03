@@ -8,6 +8,7 @@ require_once __DIR__ . '/../dto/PacienteSearchDto.php';
 require_once __DIR__ . '/../dto/PacienteDetailDto.php';
 require_once __DIR__ . '/../dto/PacienteStatsDto.php';
 require_once __DIR__ . '/HistorialService.php';
+require_once __DIR__ . '/../core/Pagination.php';
 
 /**
  * Service para manejar la lógica de negocio de Pacientes
@@ -48,6 +49,41 @@ class PacienteService implements ServiceInterface
         return array_map(function($data) {
             return PacienteDto::fromArray($data);
         }, $dataList);
+    }
+
+    /**
+     * Obtiene todos los pacientes con paginación
+     */
+    public function getAllPaginated(?int $limit = null, int $offset = 0)
+    {
+        try {
+            $dataList = $this->pacienteRepository->findAllOrdered();
+            $total = $this->pacienteRepository->countAll();
+            
+            // Apply limit and offset
+            if ($limit !== null) {
+                $dataList = array_slice($dataList, $offset, $limit);
+            }
+            
+            $pacientes = array_map(function($data) {
+                return PacienteDto::fromArray($data);
+            }, $dataList);
+            
+            $pagination = \Core\Pagination::build($limit, $offset, $total);
+            
+            return [
+                'success' => true,
+                'message' => 'Pacientes obtenidos correctamente',
+                'data' => $pacientes,
+                'pagination' => $pagination
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Error al obtener pacientes: ' . $e->getMessage(),
+                'data' => []
+            ];
+        }
     }
 
     /**

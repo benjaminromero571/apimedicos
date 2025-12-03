@@ -6,6 +6,7 @@ require_once __DIR__ . '/../dto/AsignacionDto.php';
 require_once __DIR__ . '/../dto/CreateAsignacionDto.php';
 require_once __DIR__ . '/../dto/AsignacionStatsDto.php';
 require_once __DIR__ . '/../dto/AsignacionDetailDto.php';
+require_once __DIR__ . '/../core/Pagination.php';
 
 /**
  * Service para manejar la lógica de negocio de Asignaciones
@@ -239,6 +240,41 @@ class AsignacionService implements ServiceInterface
         return array_map(function($data) {
             return AsignacionDetailDto::fromArray($data);
         }, $dataList);
+    }
+
+    /**
+     * Obtiene todas las asignaciones con detalles y paginación
+     */
+    public function getAllPaginated(?int $limit = null, int $offset = 0)
+    {
+        try {
+            $dataList = $this->asignacionRepository->findAllWithDetails();
+            
+            // Apply limit and offset manually since findAllWithDetails doesn't support it
+            $total = count($dataList);
+            if ($limit !== null) {
+                $dataList = array_slice($dataList, $offset, $limit);
+            }
+            
+            $asignaciones = array_map(function($data) {
+                return AsignacionDetailDto::fromArray($data);
+            }, $dataList);
+            
+            $pagination = \Core\Pagination::build($limit, $offset, $total);
+            
+            return [
+                'success' => true,
+                'message' => 'Asignaciones obtenidas correctamente',
+                'data' => $asignaciones,
+                'pagination' => $pagination
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Error al obtener asignaciones: ' . $e->getMessage(),
+                'data' => []
+            ];
+        }
     }
 
     /**
