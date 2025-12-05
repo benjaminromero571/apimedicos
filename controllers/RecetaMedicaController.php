@@ -137,7 +137,7 @@ class RecetaMedicaController extends BaseController
      * 
      * Query params:
      * - id_medico: int (opcional)
-    * - id_historial: int (opcional)
+     * - id_historial: int (opcional)
      * - fecha_desde: string YYYY-MM-DD (opcional)
      * - fecha_hasta: string YYYY-MM-DD (opcional)
      * - detalle: string (opcional, búsqueda parcial)
@@ -147,7 +147,11 @@ class RecetaMedicaController extends BaseController
     public function buscar(array $params): void
     {
         try {
-            $searchDto = new RecetaMedicaSearchDto($params);
+            // Merge query params with route params
+            $queryParams = $_GET ?? [];
+            $searchParams = array_merge($params, $queryParams);
+            
+            $searchDto = new RecetaMedicaSearchDto($searchParams);
             $result = $this->service->searchRecetas($searchDto);
             
             if ($result['success']) {
