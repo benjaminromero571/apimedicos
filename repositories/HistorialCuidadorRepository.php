@@ -465,7 +465,7 @@ class HistorialCuidadorRepository extends BaseRepository
             LEFT JOIN users u2 ON hc.updated_by = u2.id
             WHERE hc.id_paciente IN (
                 SELECT DISTINCT id_paciente 
-                FROM historial_cuidador 
+                FROM paciente_cuidador 
                 WHERE id_cuidador = ?
             )
         ";
