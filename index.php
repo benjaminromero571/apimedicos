@@ -84,6 +84,7 @@ require_once 'controllers/HistorialController.php';
 require_once 'controllers/HistorialCuidadorController.php';
 require_once 'controllers/UserController.php';
 require_once 'controllers/AsignacionController.php';
+require_once 'controllers/IndicacionMedicaController.php';
 require_once 'controllers/AuthController.php';
 
 // Crear instancia del router

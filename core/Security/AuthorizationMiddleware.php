@@ -21,7 +21,8 @@ class AuthorizationMiddleware
             'configuracion.*',
             'recetas.read',
             'recetas.update',
-            'recetas.delete'
+            'recetas.delete',
+            'indicaciones.*'
         ],
         'Profesional' => [
             'pacientes.*',
@@ -31,7 +32,8 @@ class AuthorizationMiddleware
             'asignaciones.create',
             'reportes.read',
             'usuarios.read',
-            'doctores.read'
+            'doctores.read',
+            'indicaciones.*'
         ],
         'Medico' => [
             'pacientes.*',
@@ -43,7 +45,8 @@ class AuthorizationMiddleware
             'usuarios.read',
             'doctores.read',
             'recetas.create',
-            'recetas.read'
+            'recetas.read',
+            'indicaciones.*'
         ],
         'Cuidador' => [
             'pacientes.read',
@@ -52,7 +55,8 @@ class AuthorizationMiddleware
             'historiales.create',
             'historiales_cuidador.*',
             'usuarios.read',
-            'asignaciones.read'
+            'asignaciones.read',
+            'indicaciones.read'
         ]
     ];
 
@@ -93,7 +97,13 @@ class AuthorizationMiddleware
         // Asignaciones
         'GET:/asignaciones' => 'asignaciones.read',
         'POST:/asignaciones' => 'asignaciones.create',
-        'DELETE:/asignaciones' => 'asignaciones.delete'
+        'DELETE:/asignaciones' => 'asignaciones.delete',
+
+        // Indicaciones Médicas
+        'GET:/indicaciones-medicas' => 'indicaciones.read',
+        'POST:/indicaciones-medicas' => 'indicaciones.create',
+        'PUT:/indicaciones-medicas' => 'indicaciones.update',
+        'DELETE:/indicaciones-medicas' => 'indicaciones.delete'
     ];
 
     /**

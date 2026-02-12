@@ -25,6 +25,7 @@ require_once __DIR__ . '/historiales_cuidador.php';
 require_once __DIR__ . '/users.php';
 require_once __DIR__ . '/asignaciones.php';
 require_once __DIR__ . '/recetas_medicas.php';
+require_once __DIR__ . '/indicaciones_medicas.php';
 
 // Endpoints administrativos (requieren permisos especiales)
 require_once __DIR__ . '/admin.php';
