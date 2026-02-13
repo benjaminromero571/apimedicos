@@ -554,7 +554,6 @@ class PacienteService implements ServiceInterface
     public function getByCuidador($cuidadorId)
     {
         $dataList = $this->pacienteRepository->findByCuidador($cuidadorId);
-        
         return array_map(function($data) {
             return PacienteDto::fromArray($data);
         }, $dataList);

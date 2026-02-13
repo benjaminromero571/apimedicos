@@ -20,13 +20,17 @@ require_once __DIR__ . '/../dto/IndicacionMedicaDetailDto.php';
  */
 class IndicacionMedicaService
 {
-    private IndicacionMedicaRepository $repository;
+    private IndicacionMedicaRepository $indicacionMedicaRepository;
     private AsignacionRepository $asignacionRepository;
+    private PacienteService $pacienteService;
+    private AsignacionService $asignacionService;
 
     public function __construct()
     {
-        $this->repository = new IndicacionMedicaRepository();
+        $this->indicacionMedicaRepository = new IndicacionMedicaRepository();
         $this->asignacionRepository = new AsignacionRepository();
+        $this->pacienteService = new PacienteService();
+        $this->asignacionService = new AsignacionService();
     }
 
     /**
@@ -40,12 +44,12 @@ class IndicacionMedicaService
                 return $this->getIndicacionesCuidador($userId, $limit, $offset);
             }
 
-            $entities = $this->repository->getAll($limit, $offset);
+            $entities = $this->indicacionMedicaRepository->getAll($limit, $offset);
             $indicaciones = [];
             foreach ($entities as $entity) {
                 $indicaciones[] = IndicacionMedicaDto::fromEntity($entity);
             }
-            $total = $this->repository->count();
+            $total = $this->indicacionMedicaRepository->count();
             return [
                 'success' => true,
                 'message' => 'Indicaciones obtenidas correctamente',
@@ -78,12 +82,12 @@ class IndicacionMedicaService
             ];
         }
 
-        $entities = $this->repository->getByPacientes($pacienteIds, $limit, $offset);
+        $entities = $this->indicacionMedicaRepository->getByPacientes($pacienteIds, $limit, $offset);
         $indicaciones = [];
         foreach ($entities as $entity) {
             $indicaciones[] = IndicacionMedicaDto::fromEntity($entity);
         }
-        $total = $this->repository->countByPacientes($pacienteIds);
+        $total = $this->indicacionMedicaRepository->countByPacientes($pacienteIds);
         return [
             'success' => true,
             'message' => 'Indicaciones obtenidas correctamente',
@@ -103,7 +107,7 @@ class IndicacionMedicaService
             if ($id <= 0) {
                 return ['success' => false, 'message' => 'ID de indicación inválido', 'data' => null];
             }
-            $entity = $this->repository->getById($id);
+            $entity = $this->indicacionMedicaRepository->getById($id);
             if (!$entity) {
                 return ['success' => false, 'message' => 'Indicación no encontrada', 'data' => null];
             }
@@ -133,7 +137,7 @@ class IndicacionMedicaService
             if ($pacienteId <= 0) {
                 return ['success' => false, 'message' => 'ID de paciente inválido', 'data' => []];
             }
-            if (!$this->repository->pacienteExists($pacienteId)) {
+            if (!$this->indicacionMedicaRepository->pacienteExists($pacienteId)) {
                 return ['success' => false, 'message' => 'El paciente no existe', 'data' => []];
             }
 
@@ -145,12 +149,12 @@ class IndicacionMedicaService
                 }
             }
 
-            $entities = $this->repository->getByPaciente($pacienteId, $limit, $offset);
+            $entities = $this->indicacionMedicaRepository->getByPaciente($pacienteId, $limit, $offset);
             $indicaciones = [];
             foreach ($entities as $entity) {
                 $indicaciones[] = IndicacionMedicaDto::fromEntity($entity);
             }
-            $total = $this->repository->count(['paciente_id' => $pacienteId]);
+            $total = $this->indicacionMedicaRepository->count(['paciente_id' => $pacienteId]);
             return [
                 'success' => true,
                 'message' => 'Indicaciones del paciente obtenidas correctamente',
@@ -199,12 +203,12 @@ class IndicacionMedicaService
                 }
             }
 
-            $entities = $this->repository->search($filters, $searchDto->getLimit(), $searchDto->getOffset());
+            $entities = $this->indicacionMedicaRepository->search($filters, $searchDto->getLimit(), $searchDto->getOffset());
             $indicaciones = [];
             foreach ($entities as $entity) {
                 $indicaciones[] = IndicacionMedicaDto::fromEntity($entity);
             }
-            $total = $this->repository->count($filters);
+            $total = $this->indicacionMedicaRepository->count($filters);
             return [
                 'success' => true,
                 'message' => 'Búsqueda completada correctamente',
@@ -230,12 +234,12 @@ class IndicacionMedicaService
             }
 
             // Verificar que el paciente exista
-            if (!$this->repository->pacienteExists($createDto->getPacienteId())) {
+            if (!$this->indicacionMedicaRepository->pacienteExists($createDto->getPacienteId())) {
                 return ['success' => false, 'message' => 'El paciente especificado no existe', 'data' => null];
             }
 
-            $id = $this->repository->create($createDto->toArray());
-            $entity = $this->repository->getById($id);
+            $id = $this->indicacionMedicaRepository->create($createDto->toArray());
+            $entity = $this->indicacionMedicaRepository->getById($id);
             $detailDto = IndicacionMedicaDetailDto::fromEntity($entity);
             return ['success' => true, 'message' => 'Indicación médica creada exitosamente', 'data' => $detailDto->toArray()];
         } catch (InvalidArgumentException $e) {
@@ -261,13 +265,13 @@ class IndicacionMedicaService
                 return ['success' => false, 'message' => 'Acceso denegado: Solo administradores, médicos y profesionales pueden editar indicaciones', 'data' => null];
             }
 
-            if (!$this->repository->exists($id)) {
+            if (!$this->indicacionMedicaRepository->exists($id)) {
                 return ['success' => false, 'message' => 'Indicación no encontrada', 'data' => null];
             }
 
             // Verificar propiedad: Médico/Profesional solo pueden editar sus propias indicaciones
             if ($userRole !== 'Administrador') {
-                $propietarioId = $this->repository->getUserIdPropietario($id);
+                $propietarioId = $this->indicacionMedicaRepository->getUserIdPropietario($id);
                 if ($propietarioId !== $userId) {
                     return ['success' => false, 'message' => 'Acceso denegado: Solo puede editar sus propias indicaciones', 'data' => null];
                 }
@@ -298,7 +302,7 @@ class IndicacionMedicaService
                 if ($pacienteId === false || $pacienteId <= 0) {
                     return ['success' => false, 'message' => 'El ID de paciente debe ser un entero positivo', 'data' => null];
                 }
-                if (!$this->repository->pacienteExists($pacienteId)) {
+                if (!$this->indicacionMedicaRepository->pacienteExists($pacienteId)) {
                     return ['success' => false, 'message' => 'El paciente especificado no existe', 'data' => null];
                 }
                 $updateData['paciente_id'] = $pacienteId;
@@ -306,8 +310,8 @@ class IndicacionMedicaService
 
             $updateData['updated_by'] = $userId;
 
-            $this->repository->update($id, $updateData);
-            $entity = $this->repository->getById($id);
+            $this->indicacionMedicaRepository->update($id, $updateData);
+            $entity = $this->indicacionMedicaRepository->getById($id);
             $detailDto = IndicacionMedicaDetailDto::fromEntity($entity);
             return ['success' => true, 'message' => 'Indicación actualizada exitosamente', 'data' => $detailDto->toArray()];
         } catch (Exception $e) {
@@ -331,19 +335,19 @@ class IndicacionMedicaService
                 return ['success' => false, 'message' => 'Acceso denegado: Solo administradores, médicos y profesionales pueden eliminar indicaciones'];
             }
 
-            if (!$this->repository->exists($id)) {
+            if (!$this->indicacionMedicaRepository->exists($id)) {
                 return ['success' => false, 'message' => 'Indicación no encontrada'];
             }
 
             // Verificar propiedad: Médico/Profesional solo pueden eliminar sus propias indicaciones
             if ($userRole !== 'Administrador') {
-                $propietarioId = $this->repository->getUserIdPropietario($id);
+                $propietarioId = $this->indicacionMedicaRepository->getUserIdPropietario($id);
                 if ($propietarioId !== $userId) {
                     return ['success' => false, 'message' => 'Acceso denegado: Solo puede eliminar sus propias indicaciones'];
                 }
             }
 
-            $this->repository->delete($id);
+            $this->indicacionMedicaRepository->delete($id);
             return ['success' => true, 'message' => 'Indicación eliminada exitosamente'];
         } catch (Exception $e) {
             return ['success' => false, 'message' => 'Error al eliminar la indicación: ' . $e->getMessage()];
@@ -355,13 +359,12 @@ class IndicacionMedicaService
      */
     private function getPacientesAsignados(int $userId): array
     {
-        $asignaciones = $this->asignacionRepository->findByUser($userId);
+        $pacientes = $this->pacienteService->getByCuidador($userId);
+        error_log("Pacientes asignados para cuidador $userId: " . count($pacientes));
         $pacienteIds = [];
-        foreach ($asignaciones as $asignacion) {
-            if (is_array($asignacion) && isset($asignacion['paciente_id'])) {
-                $pacienteIds[] = (int)$asignacion['paciente_id'];
-            } elseif (is_object($asignacion) && method_exists($asignacion, 'getPacienteId')) {
-                $pacienteIds[] = $asignacion->getPacienteId();
+        foreach ($pacientes as $paciente) {
+            if ($paciente instanceof PacienteDto && $paciente->idpaciente !== null) {
+                $pacienteIds[] = $paciente->idpaciente;
             }
         }
         return $pacienteIds;

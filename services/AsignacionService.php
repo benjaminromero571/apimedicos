@@ -16,7 +16,7 @@ class AsignacionService implements ServiceInterface
 {
     private $asignacionRepository;
     
-    public function __construct(AsignacionRepository $asignacionRepository = null)
+    public function __construct(?AsignacionRepository $asignacionRepository = null)
     {
         $this->asignacionRepository = $asignacionRepository ?: new AsignacionRepository();
     }
