@@ -1,7 +1,13 @@
 <?php
-
+require_once __DIR__ . '/../libs/phpmailer/Exception.php';
+require_once __DIR__ . '/../libs/phpmailer/PHPMailer.php';
+require_once __DIR__ . '/../libs/phpmailer/SMTP.php';
 require_once __DIR__ . '/../core/Security/JWTService.php';
 require_once __DIR__ . '/../services/UserService.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\SMTP;   
 
 class AuthController extends BaseController
 {
@@ -73,6 +79,63 @@ class AuthController extends BaseController
         }
     }
 
+    public function forgotPassword($params = []) {
+    try {
+        $data = $this->getJsonInput(); // Obtener datos de Angular
+        $email = $this->sanitizeString($data['email']);
+
+        // 1. Verificar si el usuario existe (usando tu UserService)
+        $result = $this->userService->getUserByEmail($email);
+        
+        if ($result['success']) {
+            $user = $result['data'];
+            
+            // 2. Generar token único
+            $token = bin2hex(random_bytes(32));
+            $expires = date("Y-m-d H:i:s", strtotime("+1 hour"));
+            
+            // 3. Guardar en la base de datos
+            // Ajusta esta query según cómo manejes tu conexión a DB actual
+            $this->db->query("INSERT INTO password_resets (email, token, expires_at) 
+                             VALUES (?, ?, ?)", [$email, $token, $expires]);
+            
+            // 4. Enviar el correo
+            $link = "http://localhost:4200/#/reset-password?token=" . $token;
+            $this->sendEmail($email, "Recuperar Contraseña", 
+                "Hola, para restablecer tu clave haz clic aquí: <a href='$link'>$link</a>");
+        }
+
+        // Siempre respondemos éxito por seguridad
+        $this->jsonResponse(null, "Si el correo existe, recibirás instrucciones.");
+
+    } catch (Exception $e) {
+        $this->jsonError("Error: " . $e->getMessage(), 500);
+    }
+}
+
+    public function resetPassword($request) {
+    $token = $request->token;
+    $newPassword = $request->password;
+    
+    // 1. Validar el token y que no haya expirado
+    $reset = $this->db->query("SELECT email FROM password_resets 
+                              WHERE token = ? AND expires_at > NOW()", [$token])->first();
+    
+    if (!$reset) {
+        return ["status" => "error", "message" => "El enlace ha expirado o es inválido."];
+    }
+    
+    // 2. Encriptar la nueva contraseña con BCRYPT
+    $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+    
+    // 3. Actualizar la tabla 'users'
+    $this->db->query("UPDATE users SET password = ? WHERE email = ?", [$hashedPassword, $reset->email]);
+    
+    // 4. Borrar el token para que no se use de nuevo
+    $this->db->query("DELETE FROM password_resets WHERE email = ?", [$reset->email]);
+    
+    return ["status" => "success", "message" => "Contraseña actualizada correctamente."];
+}
     /**
      * Verifica un JWT token
      */
@@ -307,6 +370,37 @@ class AuthController extends BaseController
 
         return null;
     }
+
+    private function sendEmail($to, $subject, $body) {
+    $mail = new PHPMailer(true);
+
+    try {
+        // Configuración del Servidor SMTP
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com'; // Servidor de Gmail
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'tu-correo@gmail.com'; // Cambia esto
+        $mail->Password   = 'tu-clave-de-aplicacion'; // Contraseña de aplicación de 16 dígitos
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
+
+        // Destinatarios
+        $mail->setFrom('no-reply@tuapp.com', 'Sistema Medico GICO');
+        $mail->addAddress($to);
+
+        // Contenido
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $body;
+        $mail->CharSet = 'UTF-8';
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("PHPMailer Error: " . $mail->ErrorInfo);
+        return false;
+    }
+}
 
     /**
      * Obtiene la IP del cliente

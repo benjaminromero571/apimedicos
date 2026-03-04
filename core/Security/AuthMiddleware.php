@@ -8,7 +8,11 @@ class AuthMiddleware
      * Middleware simple para verificar autenticación
      */
     public static function verify()
-    {
+    {$requestUri = $_SERVER['REQUEST_URI'];
+    if (strpos($requestUri, 'auth/forgot-password') !== false || 
+        strpos($requestUri, 'auth/reset-password') !== false) {
+        return ['success' => true, 'is_public' => true];
+    }
         $token = self::getAuthToken();
         
         if (!$token) {
