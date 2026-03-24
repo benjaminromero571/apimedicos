@@ -2,17 +2,97 @@
 
 require_once __DIR__ . '/../core/Security/JWTService.php';
 require_once __DIR__ . '/../services/UserService.php';
+require_once __DIR__ . '/../repositories/PasswordResetRepository.php';
+require_once __DIR__ . '/../services/EmailService.php';
 
 class AuthController extends BaseController
 {
     private $userService;
+    private $passwordResetRepository;
 
     public function __construct()
     {
         parent::__construct();
         $this->userService = new UserService();
+        $this->passwordResetRepository = new PasswordResetRepository();
     }
 
+    public function forgotPassword($params = [])
+    {
+        try {
+            $data = $this->getJsonInput();
+            
+            if (!$data || !isset($data['email'])) {
+                $this->jsonError("Email requerido", 400);
+                return;
+            }
+
+            $email = $this->sanitizeString($data['email']);
+
+            $result = $this->userService->getUserByEmail($email);
+
+            if (!$result['success']) {
+                $this->jsonError("No existe un usuario con ese correo electrónico", 404);
+                return;
+            }
+
+            $token = bin2hex(random_bytes(32));
+
+            $this->passwordResetRepository->createResetToken($email, $token);
+
+            EmailService::sendPasswordResetEmail($email, $token);
+
+            $this->jsonResponse(null, "Se ha enviado un correo electrónico con instrucciones para recuperar su contraseña");
+
+        } catch (Exception $e) {
+            error_log("Forgot password error: " . $e->getMessage());
+            $this->jsonError("Error en la solicitud de recuperación de contraseña: " . $e->getMessage(), 500);
+        }
+    }
+
+    public function resetPassword($params = [])
+    {
+        try {
+            $data = $this->getJsonInput();
+            
+            if (!$data || !isset($data['token']) || !isset($data['password'])) {
+                $this->jsonError("Token y nueva contraseña requeridos", 400);
+                return;
+            }
+
+            $token = $this->sanitizeString($data['token']);
+            $password = $data['password'];
+
+            $resetRequest = $this->passwordResetRepository->getResetToken($token);
+
+            if (!$resetRequest) {
+                $this->jsonError("Token inválido o expirado", 400);
+                return;
+            }
+
+            $tokenCreatedAt = strtotime($resetRequest['created_at']);
+            if (time() - $tokenCreatedAt > 3600) { // 1 hour expiration
+                $this->passwordResetRepository->delete($resetRequest['email']);
+                $this->jsonError("Token inválido o expirado", 400);
+                return;
+            }
+            
+            $result = $this->userService->resetPassword($resetRequest['email'], $password);
+
+            if (!$result['success']) {
+                $this->jsonError($result['message'], 500);
+                return;
+            }
+
+            $this->passwordResetRepository->delete($resetRequest['email']);
+
+            $this->jsonResponse(null, "Contraseña actualizada correctamente");
+
+        } catch (Exception $e) {
+            error_log("Reset password error: " . $e->getMessage());
+            $this->jsonError("Error al restablecer la contraseña: " . $e->getMessage(), 500);
+        }
+    }
     /**
      * Maneja el login de usuarios
      */

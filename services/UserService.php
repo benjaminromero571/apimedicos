@@ -692,6 +692,50 @@ class UserService
         }
     }
 
+    public function resetPassword($email, $newPassword)
+    {
+        try {
+            $entity = $this->userRepository->findByEmail($email);
+            
+            if (!$entity) {
+                return [
+                    'success' => false,
+                    'message' => 'Usuario no encontrado'
+                ];
+            }
+
+            // Validar nueva contraseña
+            if (strlen($newPassword) < 6) {
+                return [
+                    'success' => false,
+                    'message' => 'La nueva contraseña debe tener al menos 6 caracteres'
+                ];
+            }
+
+            // Actualizar contraseña
+            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+            $updated = $this->userRepository->update($entity->id, ['password' => $hashedPassword]);
+            
+            if (!$updated) {
+                return [
+                    'success' => false,
+                    'message' => 'Error al actualizar la contraseña'
+                ];
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Contraseña actualizada correctamente'
+            ];
+
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Error al cambiar contraseña: ' . $e->getMessage()
+            ];
+        }
+    }
+
     /** Cambia la contraseña de un usuario por un administrador */
     public function adminChangeUserPassword($userId, $newPassword)
     {

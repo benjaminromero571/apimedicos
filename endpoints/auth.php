@@ -6,4 +6,6 @@ $router->get('/auth/verify', 'AuthController@verify');
 $router->post('/auth/refresh', 'AuthController@refresh');
 $router->post('/auth/logout', 'AuthController@logout');
 $router->get('/auth/check-email', 'AuthController@checkEmail');
+$router->post('/auth/forgot-password', 'AuthController@forgotPassword');
+$router->post('/auth/reset-password', 'AuthController@resetPassword');
 ?>
