@@ -1,10 +1,13 @@
 # Dependencies
 /vendor/
 
-# Environment variables
+# Environment variables / credenciales
 .env
 .env.local
 .env.*.local
+
+# Credenciales de DB hardcoded - cada entorno tiene su propio archivo
+conexion.php
 
 # IDE
 .idea/
