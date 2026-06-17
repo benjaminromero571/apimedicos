@@ -15,7 +15,9 @@ class PacienteRepository extends BaseRepository
         'nompaciente',
         'edadpaciente',
         'telpaciente',
-        'dirpaciente'
+        'dirpaciente',
+        'activo',
+        'motivo_baja'
     ];
 
     /**
@@ -177,6 +179,51 @@ class PacienteRepository extends BaseRepository
     }
 
     /**
+     * Obtiene solo pacientes activos
+     */
+    public function findActivos()
+    {
+        $query = "SELECT * FROM {$this->table} WHERE activo = 1 ORDER BY nompaciente ASC";
+        $result = $this->executeQuery($query);
+
+        $records = [];
+        while ($data = $result->fetch_assoc()) {
+            $records[] = $data;
+        }
+
+        return $records;
+    }
+
+    /**
+     * Obtiene solo pacientes inactivos
+     */
+    public function findInactivos()
+    {
+        $query = "SELECT * FROM {$this->table} WHERE activo = 0 ORDER BY nompaciente ASC";
+        $result = $this->executeQuery($query);
+
+        $records = [];
+        while ($data = $result->fetch_assoc()) {
+            $records[] = $data;
+        }
+
+        return $records;
+    }
+
+    /**
+     * Cambia el estado activo/inactivo de un paciente, con motivo de baja opcional
+     */
+    public function cambiarEstado($pacienteId, $activo, $motivoBaja = null)
+    {
+        $activoInt = $activo ? 1 : 0;
+        $query = "UPDATE {$this->table} SET activo = ?, motivo_baja = ? WHERE {$this->primaryKey} = ?";
+        $stmt = $this->conexion->prepare($query);
+        $stmt->bind_param('isi', $activoInt, $motivoBaja, $pacienteId);
+
+        return $stmt->execute();
+    }
+
+    /**
      * Cuenta el total de pacientes
      */
     public function countAll()
@@ -185,6 +232,20 @@ class PacienteRepository extends BaseRepository
         $result = $this->executeQuery($query);
         $data = $result->fetch_assoc();
         return (int)$data['total'];
+    }
+
+    /**
+     * Cuenta pacientes activos e inactivos
+     */
+    public function countByEstado()
+    {
+        $query = "SELECT
+                    SUM(activo = 1) as total_activos,
+                    SUM(activo = 0) as total_inactivos,
+                    COUNT(*) as total
+                  FROM {$this->table}";
+        $result = $this->executeQuery($query);
+        return $result->fetch_assoc();
     }
 
     /**

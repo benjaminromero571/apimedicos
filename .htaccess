@@ -1,10 +1,7 @@
 RewriteEngine On
 
-# Manejar CORS preflight requests primero
-RewriteCond %{REQUEST_METHOD} OPTIONS
-RewriteRule ^(.*)$ index.php [QSA,L]
-
-# Redireccionar todas las peticiones al index.php
+# Todas las peticiones (incluyendo OPTIONS preflight) van a index.php.
+# PHP (SecurityHeaders) se encarga de los headers CORS y de cerrar OPTIONS con 200.
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php [QSA,L]
@@ -25,8 +22,6 @@ RewriteRule ^(.*)$ index.php [QSA,L]
     Order Allow,Deny
     Deny from all
 </Files>
-
-# Configurar headers de seguridad y CORS
 
 # Configurar tipos MIME
 AddType application/json .json

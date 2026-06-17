@@ -166,6 +166,79 @@ class PacienteController extends BaseController
     }
 
     /**
+     * Obtiene todos los pacientes activos
+     */
+    public function obtenerActivos($params = [])
+    {
+        try {
+            $pacientes = $this->pacienteService->getActivos();
+
+            $response = array_map(function($dto) {
+                return $dto->toArray();
+            }, $pacientes);
+
+            $this->jsonResponse($response);
+        } catch (Exception $e) {
+            $this->jsonError("Error al obtener pacientes activos: " . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Obtiene todos los pacientes inactivos
+     */
+    public function obtenerInactivos($params = [])
+    {
+        try {
+            $pacientes = $this->pacienteService->getInactivos();
+
+            $response = array_map(function($dto) {
+                return $dto->toArray();
+            }, $pacientes);
+
+            $this->jsonResponse($response);
+        } catch (Exception $e) {
+            $this->jsonError("Error al obtener pacientes inactivos: " . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Cambia el estado activo/inactivo de un paciente
+     */
+    public function cambiarEstado($params)
+    {
+        try {
+            if (!isset($params['id'])) {
+                $this->jsonError("ID de paciente requerido", 400);
+                return;
+            }
+
+            $data = $this->getJsonInput();
+
+            if (!$data || !isset($data['activo'])) {
+                $this->jsonError("Campo 'activo' requerido (true/false o 1/0)", 400);
+                return;
+            }
+
+            $activo = filter_var($data['activo'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+            if ($activo === null) {
+                $this->jsonError("El campo 'activo' debe ser true, false, 1 o 0", 400);
+                return;
+            }
+
+            $motivoBaja = $data['motivo_baja'] ?? null;
+
+            $paciente = $this->pacienteService->cambiarEstado($params['id'], $activo, $motivoBaja);
+
+            $estado = $activo ? 'activado' : 'desactivado';
+            $this->jsonResponse($paciente->toArray(), "Paciente {$estado} exitosamente");
+
+        } catch (Exception $e) {
+            $this->jsonError("Error al cambiar estado del paciente: " . $e->getMessage(), 500);
+        }
+    }
+
+    /**
      * Busca pacientes por nombre
      */
     public function buscar($params = [])

@@ -52,7 +52,7 @@ class SecurityHeaders
         }
         
         // Métodos permitidos
-        $methods = $allowedMethods ?: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'];
+        $methods = $allowedMethods ?: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
         header('Access-Control-Allow-Methods: ' . implode(', ', $methods));
         
         // Headers permitidos
@@ -69,8 +69,8 @@ class SecurityHeaders
         // Permitir credenciales
         header('Access-Control-Allow-Credentials: true');
         
-        // Tiempo de cache para preflight
-        header('Access-Control-Max-Age: 86400'); // 24 horas
+        // Tiempo de cache para preflight (0 = no cachear, evita preflights cacheados con valores viejos)
+        header('Access-Control-Max-Age: 0');
         
         // Headers expuestos al cliente
         header('Access-Control-Expose-Headers: Authorization, Content-Length, X-Kuma-Revision');

@@ -27,8 +27,9 @@ class ProfesionalService
     {
         try {
             $entities = $this->profesionalRepository->getAll($orderBy, $limit, $offset);
-            
-            if (!$entities) {
+
+            // Lista vacía es un caso válido (no hay profesionales registrados).
+            if (!is_array($entities)) {
                 return [
                     'success' => false,
                     'message' => 'No se pudieron obtener los profesionales',

@@ -14,6 +14,8 @@ class PacienteDto
     public $edadpaciente_numeric;
     public $telpaciente;
     public $dirpaciente;
+    public $activo;
+    public $motivo_baja;
     public $cuidador_name;
     public $cuidador_email;
 
@@ -30,6 +32,8 @@ class PacienteDto
         $this->edadpaciente = $data['edadpaciente'] ?? null;
         $this->telpaciente = $data['telpaciente'] ?? null;
         $this->dirpaciente = $data['dirpaciente'] ?? null;
+        $this->activo = isset($data['activo']) ? (int) $data['activo'] : 1;
+        $this->motivo_baja = $data['motivo_baja'] ?? null;
         $this->cuidador_name = $data['cuidador_name'] ?? null;
         $this->cuidador_email = $data['cuidador_email'] ?? null;
         
@@ -55,6 +59,8 @@ class PacienteDto
             'edadpaciente_numeric' => $this->edadpaciente_numeric,
             'telpaciente' => $this->telpaciente,
             'dirpaciente' => $this->dirpaciente,
+            'activo' => $this->activo,
+            'motivo_baja' => $this->motivo_baja,
             'cuidador_name' => $this->cuidador_name,
             'cuidador_email' => $this->cuidador_email
         ];

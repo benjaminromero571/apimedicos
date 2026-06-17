@@ -8,6 +8,11 @@ $router->get('/pacientes', 'PacienteController@obtenerTodos');
 // GET /pacientes/paginated?limit=20&offset=0
 $router->get('/pacientes/paginated', 'PacienteController@obtenerTodosPaginados');
 
+// Rutas de estado activo/inactivo
+$router->get('/pacientes/activos', 'PacienteController@obtenerActivos');
+$router->get('/pacientes/inactivos', 'PacienteController@obtenerInactivos');
+$router->patch('/pacientes/{id}/estado', 'PacienteController@cambiarEstado');
+
 $router->get('/pacientes/buscar', 'PacienteController@buscar');
 $router->get('/pacientes/rut/{rut}', 'PacienteController@obtenerPorRut');
 $router->get('/pacientes/{id}', 'PacienteController@obtenerPorId');

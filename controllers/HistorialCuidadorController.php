@@ -5,6 +5,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/../core/BaseController.php';
 require_once __DIR__ . '/../core/Security/AuthMiddleware.php';
 require_once __DIR__ . '/../services/HistorialCuidadorService.php';
+require_once __DIR__ . '/../services/EmailService.php';
+require_once __DIR__ . '/../repositories/UserRepository.php';
 
 /**
  * HistorialCuidadorController - Controlador REST para historiales de cuidador
@@ -244,8 +246,11 @@ class HistorialCuidadorController extends BaseController
             $data['created_by'] = $user->id;
 
             $result = $this->service->createHistorial($data);
-            
+
             if ($result['success']) {
+                if ($user->rol === 'Cuidador') {
+                    $this->notificarAdministradoresNuevaEvolucion($result['data']);
+                }
                 $this->jsonResponse($result['data'], $result['message'], 201);
             } else {
                 $this->jsonError($result['message'], 400);
@@ -253,6 +258,40 @@ class HistorialCuidadorController extends BaseController
 
         } catch (Exception $e) {
             $this->jsonError("Error interno del servidor: " . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Envía un correo a todos los administradores cuando un cuidador
+     * registra una nueva evolución. Los errores se registran pero no
+     * afectan la respuesta al cliente.
+     */
+    private function notificarAdministradoresNuevaEvolucion(array $historial): void
+    {
+        try {
+            $userRepo = new UserRepository();
+            $admins = $userRepo->getByRol('Administrador');
+
+            $emails = [];
+            foreach ($admins as $admin) {
+                if (!empty($admin->email)) {
+                    $emails[] = $admin->email;
+                }
+            }
+
+            if (empty($emails)) {
+                return;
+            }
+
+            EmailService::sendNewEvolucionToAdmins($emails, [
+                'nombre_cuidador' => $historial['cuidador']['nombre'] ?? null,
+                'nombre_paciente' => $historial['paciente']['nombre'] ?? null,
+                'id_paciente'     => $historial['paciente']['id'] ?? null,
+                'detalle'         => $historial['detalle'] ?? '',
+                'fecha_historial' => $historial['fecha_historial'] ?? '',
+            ]);
+        } catch (Exception $e) {
+            error_log('Error notificando a administradores: ' . $e->getMessage());
         }
     }
 

@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('America/Santiago');
+
 // Cargar configuraciones de entorno
 require_once 'core/Security/SecurityConfig.php';
 // Ruta a la raíz del proyecto

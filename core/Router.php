@@ -37,6 +37,14 @@ class Router
     }
 
     /**
+     * Registra una ruta PATCH
+     */
+    public function patch($path, $handler)
+    {
+        $this->addRoute('PATCH', $path, $handler);
+    }
+
+    /**
      * Agrega una ruta al registro
      */
     private function addRoute($method, $path, $handler)

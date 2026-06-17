@@ -375,6 +375,75 @@ class PacienteService implements ServiceInterface
     }
 
     /**
+     * Obtiene todos los pacientes activos
+     */
+    public function getActivos()
+    {
+        $dataList = $this->pacienteRepository->findActivos();
+
+        return array_map(function($data) {
+            return PacienteDto::fromArray($data);
+        }, $dataList);
+    }
+
+    /**
+     * Obtiene todos los pacientes inactivos
+     */
+    public function getInactivos()
+    {
+        $dataList = $this->pacienteRepository->findInactivos();
+
+        return array_map(function($data) {
+            return PacienteDto::fromArray($data);
+        }, $dataList);
+    }
+
+    /**
+     * Cambia el estado activo/inactivo de un paciente
+     * Si activo=false y no se envía motivoBaja, se usa 'baja' por defecto.
+     * Valores válidos para motivoBaja: 'sanado' o 'baja'.
+     * Si activo=true, motivoBaja se fuerza a null.
+     */
+    public function cambiarEstado($id, $activo, $motivoBaja = null)
+    {
+        if (!$this->pacienteRepository->exists($id)) {
+            throw new Exception('El paciente no existe');
+        }
+
+        $valoresPermitidos = ['sanado', 'baja'];
+
+        if (!$activo) {
+            // Default a 'baja' si el frontend no manda motivo
+            if (empty($motivoBaja)) {
+                $motivoBaja = 'baja';
+            }
+            if (!in_array($motivoBaja, $valoresPermitidos, true)) {
+                throw new Exception('Motivo de baja inválido. Valores permitidos: sanado, baja');
+            }
+        } else {
+            $motivoBaja = null;
+        }
+
+        try {
+            $this->pacienteRepository->beginTransaction();
+
+            $success = $this->pacienteRepository->cambiarEstado($id, $activo, $motivoBaja);
+
+            if (!$success) {
+                throw new Exception('Error al cambiar el estado del paciente');
+            }
+
+            $this->pacienteRepository->commit();
+
+            return $this->getById($id);
+
+        } catch (Exception $e) {
+            $this->pacienteRepository->rollback();
+            throw $e;
+        }
+    }
+
+    /**
      * Verifica si un paciente tiene asignaciones activas
      */
     public function hasAsignaciones($id)

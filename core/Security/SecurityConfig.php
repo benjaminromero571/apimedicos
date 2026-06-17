@@ -44,7 +44,7 @@ class SecurityConfig
         
         return [
             'origins' => explode(',', $allowedOrigins),
-            'methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+            'methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
             'headers' => [
                 'Origin', 
                 'X-Requested-With', 
@@ -55,7 +55,7 @@ class SecurityConfig
                 'X-User-Role'
             ],
             'credentials' => true,
-            'max_age' => 86400
+            'max_age' => 0
         ];
     }
 

@@ -13,6 +13,8 @@ class PacienteEntity
     private $edadpaciente;
     private $telpaciente;
     private $dirpaciente;
+    private $activo;
+    private $motivo_baja;
 
     public function __construct(array $data = [])
     {
@@ -47,6 +49,14 @@ class PacienteEntity
         if (isset($data['dirpaciente'])) {
             $this->dirpaciente = $data['dirpaciente'];
         }
+
+        if (isset($data['activo'])) {
+            $this->activo = (int) $data['activo'];
+        } else {
+            $this->activo = 1;
+        }
+
+        $this->motivo_baja = $data['motivo_baja'] ?? null;
     }
 
     // Getters
@@ -117,6 +127,32 @@ class PacienteEntity
         return $this;
     }
 
+    public function getActivo()
+    {
+        return $this->activo;
+    }
+
+    public function setActivo($activo)
+    {
+        $this->activo = (int) $activo;
+        return $this;
+    }
+
+    public function isActivo()
+    {
+        return $this->activo === 1;
+    }
+
+    public function getMotivoBaja()
+    {
+        return $this->motivo_baja;
+    }
+
+    public function setMotivoBaja($motivo_baja)
+    {
+        $this->motivo_baja = $motivo_baja;
+        return $this;
+    }
 
     /**
      * Convierte la entidad a array
@@ -129,7 +165,9 @@ class PacienteEntity
             'nompaciente' => $this->nompaciente,
             'edadpaciente' => $this->edadpaciente,
             'telpaciente' => $this->telpaciente,
-            'dirpaciente' => $this->dirpaciente
+            'dirpaciente' => $this->dirpaciente,
+            'activo' => $this->activo,
+            'motivo_baja' => $this->motivo_baja
         ];
     }
 
@@ -167,7 +205,9 @@ class PacienteEntity
             'nompaciente' => $this->nompaciente,
             'edadpaciente' => $this->edadpaciente,
             'telpaciente' => $this->telpaciente,
-            'dirpaciente' => $this->dirpaciente
+            'dirpaciente' => $this->dirpaciente,
+            'activo' => $this->activo,
+            'motivo_baja' => $this->motivo_baja
         ];
     }
 }
